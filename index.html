@@ -80,38 +80,38 @@
 
     <section class="grid">
       <div>
-        <label for="qRealtime">Q实时</label>
+        <label for="qRealtime">Q<sub>实时</sub></label>
         <input id="qRealtime" type="number" step="any" placeholder="请输入 Q实时" />
       </div>
       <div>
-        <label for="pRealtime">P实时</label>
+        <label for="pRealtime">P<sub>实时</sub></label>
         <input id="pRealtime" type="number" step="any" placeholder="请输入 P实时" />
       </div>
       <div>
-        <label for="qDayAhead">Q日前</label>
+        <label for="qDayAhead">Q<sub>日前</sub></label>
         <input id="qDayAhead" type="number" step="any" placeholder="请输入 Q日前" />
       </div>
       <div>
-        <label for="pDayAhead">P日前</label>
+        <label for="pDayAhead">P<sub>日前</sub></label>
         <input id="pDayAhead" type="number" step="any" placeholder="请输入 P日前" />
       </div>
       <div>
-        <label for="qLongTerm">Q中长期</label>
+        <label for="qLongTerm">Q<sub>中长期</sub></label>
         <input id="qLongTerm" type="number" step="any" placeholder="请输入 Q中长期" />
       </div>
       <div>
-        <label for="pLongTerm">P中长期</label>
+        <label for="pLongTerm">P<sub>中长期</sub></label>
         <input id="pLongTerm" type="number" step="any" placeholder="请输入 P中长期" />
       </div>
       <div>
-        <label for="pSettlementRef">P结算参考点</label>
+        <label for="pSettlementRef">P<sub>结算参考点</sub></label>
         <input id="pSettlementRef" type="number" step="any" placeholder="请输入 P结算参考点" />
       </div>
     </section>
 
     <section class="result">
       <div>电费</div>
-      <div class="amount" id="powerFee">0.00</div>
+      <div class="amount" id="powerFee">0.000</div>
     </section>
   </main>
 
@@ -146,8 +146,8 @@
         qLongTerm * (pLongTerm - pSettlementRef);
 
       document.getElementById('powerFee').textContent = powerFee.toLocaleString('zh-CN', {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
+        minimumFractionDigits: 3,
+        maximumFractionDigits: 3
       });
     };
 
