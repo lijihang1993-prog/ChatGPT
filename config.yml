@@ -1,0 +1,24 @@
+thresholds:
+  ocf_to_net_profit_min: 0.6
+  debt_ratio_increase_pct_point: 5.0
+  ar_or_inventory_vs_revenue_growth_gap_pct_point: 10.0
+
+display:
+  unit: 百万
+  currency_suffix: 元
+
+mappings:
+  revenue: ["营业收入", "主营业务收入", "营业总收入"]
+  operating_cost: ["营业成本", "主营业务成本"]
+  net_profit: ["净利润", "归属于母公司股东的净利润", "归母净利润"]
+  selling_expense: ["销售费用"]
+  admin_expense: ["管理费用"]
+  rd_expense: ["研发费用"]
+  finance_expense: ["财务费用"]
+  total_assets: ["资产总计"]
+  total_liabilities: ["负债合计", "负债总计"]
+  current_assets: ["流动资产合计"]
+  current_liabilities: ["流动负债合计"]
+  operating_cashflow: ["经营活动产生的现金流量净额", "经营活动现金流量净额"]
+  accounts_receivable: ["应收账款"]
+  inventory: ["存货"]
