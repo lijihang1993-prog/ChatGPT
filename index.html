@@ -16,9 +16,10 @@
       place-items: center;
       background: linear-gradient(160deg, #f4f8ff, #eef3ff);
       color: #1d2a44;
+      padding: 24px 0;
     }
     .card {
-      width: min(720px, 92vw);
+      width: min(860px, 92vw);
       background: #fff;
       border-radius: 16px;
       box-shadow: 0 12px 28px rgba(21, 40, 95, 0.12);
@@ -33,6 +34,40 @@
       margin-top: 0;
       color: #5d6a84;
       font-size: 0.95rem;
+    }
+    .formula-switch {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      margin: 14px 0 18px;
+    }
+    .formula-btn {
+      border: 1px solid #c5d3f5;
+      background: #f7f9ff;
+      color: #28408f;
+      border-radius: 10px;
+      padding: 10px 12px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: all 0.2s ease;
+    }
+    .formula-btn:hover {
+      background: #edf2ff;
+    }
+    .formula-btn.active {
+      background: #3155c9;
+      border-color: #3155c9;
+      color: #fff;
+    }
+    .formula-box {
+      margin-bottom: 14px;
+      background: #f9fbff;
+      border: 1px solid #dde6ff;
+      border-radius: 10px;
+      padding: 12px;
+      font-size: 0.95rem;
+      line-height: 1.45;
+      color: #33456f;
     }
     .grid {
       display: grid;
@@ -58,13 +93,42 @@
       border-color: #5f7be4;
       box-shadow: 0 0 0 3px rgba(95, 123, 228, 0.15);
     }
+    .actions {
+      margin-top: 18px;
+      display: flex;
+      justify-content: flex-start;
+    }
+    .calc-btn {
+      border: none;
+      border-radius: 10px;
+      background: #2f53c3;
+      color: white;
+      font-size: 1rem;
+      padding: 10px 20px;
+      cursor: pointer;
+    }
+    .calc-btn:hover {
+      background: #2345af;
+    }
     .result {
-      margin-top: 20px;
+      margin-top: 18px;
       background: #f6f9ff;
       border: 1px solid #d7e3ff;
       border-radius: 12px;
       padding: 16px;
       font-size: 1.1rem;
+    }
+    .sub-title {
+      font-size: 0.92rem;
+      color: #50608a;
+      margin-bottom: 6px;
+    }
+    .formula-expression {
+      word-break: break-all;
+      font-family: "SFMono-Regular", Menlo, Consolas, monospace;
+      color: #2a3b66;
+      font-size: 0.95rem;
+      margin-bottom: 10px;
     }
     .amount {
       font-size: 1.8rem;
@@ -76,7 +140,18 @@
 <body>
   <main class="card">
     <h1>电费自动计算器</h1>
-    <p class="hint">输入 7 个参数后将自动计算“电费”。留空默认按 0 计算。</p>
+    <p class="hint">先选择公式，输入 7 个参数后点击“计算”展示结果。留空默认按 0 计算。</p>
+
+    <section class="formula-switch">
+      <button class="formula-btn active" type="button" data-formula="1">公式一</button>
+      <button class="formula-btn" type="button" data-formula="2">公式二</button>
+      <button class="formula-btn" type="button" data-formula="3">公式三</button>
+    </section>
+
+    <section class="formula-box">
+      <div><strong>当前选用公式：</strong></div>
+      <div id="formulaText">电费 = Q<sub>实时</sub>*P<sub>实时</sub> + Q<sub>日前</sub>*(P<sub>日前</sub>-P<sub>实时</sub>) + Q<sub>中长期</sub>*(P<sub>中长期</sub>-P<sub>结算参考点</sub>)</div>
+    </section>
 
     <section class="grid">
       <div>
@@ -109,53 +184,105 @@
       </div>
     </section>
 
+    <div class="actions">
+      <button class="calc-btn" id="calculateBtn" type="button">计算</button>
+    </div>
+
     <section class="result">
+      <div class="sub-title">代入数值后的公式</div>
+      <div class="formula-expression" id="formulaExpression">-</div>
       <div>电费</div>
       <div class="amount" id="powerFee">0.000</div>
     </section>
   </main>
 
   <script>
-    const fields = [
-      'qRealtime',
-      'pRealtime',
-      'qDayAhead',
-      'pDayAhead',
-      'qLongTerm',
-      'pLongTerm',
-      'pSettlementRef'
-    ];
+    const formulaMap = {
+      1: {
+        text: '电费 = Q<sub>实时</sub>*P<sub>实时</sub> + Q<sub>日前</sub>*(P<sub>日前</sub>-P<sub>实时</sub>) + Q<sub>中长期</sub>*(P<sub>中长期</sub>-P<sub>结算参考点</sub>)',
+        expression: ({ qRealtime, pRealtime, qDayAhead, pDayAhead, qLongTerm, pLongTerm, pSettlementRef }) =>
+          `${qRealtime}*${pRealtime}+${qDayAhead}*(${pDayAhead}-${pRealtime})+${qLongTerm}*(${pLongTerm}-${pSettlementRef})`,
+        calculate: ({ qRealtime, pRealtime, qDayAhead, pDayAhead, qLongTerm, pLongTerm, pSettlementRef }) =>
+          qRealtime * pRealtime +
+          qDayAhead * (pDayAhead - pRealtime) +
+          qLongTerm * (pLongTerm - pSettlementRef)
+      },
+      2: {
+        text: '电费 = Q<sub>日前</sub>*P<sub>日前</sub> + (Q<sub>实时</sub>-Q<sub>日前</sub>)*P<sub>实时</sub> + Q<sub>中长期</sub>*(P<sub>中长期</sub>-P<sub>结算参考点</sub>)',
+        expression: ({ qRealtime, pRealtime, qDayAhead, pDayAhead, qLongTerm, pLongTerm, pSettlementRef }) =>
+          `${qDayAhead}*${pDayAhead}+(${qRealtime}-${qDayAhead})*${pRealtime}+${qLongTerm}*(${pLongTerm}-${pSettlementRef})`,
+        calculate: ({ qRealtime, pRealtime, qDayAhead, pDayAhead, qLongTerm, pLongTerm, pSettlementRef }) =>
+          qDayAhead * pDayAhead +
+          (qRealtime - qDayAhead) * pRealtime +
+          qLongTerm * (pLongTerm - pSettlementRef)
+      },
+      3: {
+        text: '电费 = Q<sub>中长期</sub>*P<sub>中长期</sub> + Q<sub>中长期</sub>*(P<sub>日前</sub>-P<sub>结算参考点</sub>) + (Q<sub>日前</sub>-Q<sub>中长期</sub>)*P<sub>日前</sub> + (Q<sub>实时</sub>-Q<sub>日前</sub>)*P<sub>实时</sub>',
+        expression: ({ qRealtime, pRealtime, qDayAhead, pDayAhead, qLongTerm, pLongTerm, pSettlementRef }) =>
+          `${qLongTerm}*${pLongTerm}+${qLongTerm}*(${pDayAhead}-${pSettlementRef})+(${qDayAhead}-${qLongTerm})*${pDayAhead}+(${qRealtime}-${qDayAhead})*${pRealtime}`,
+        calculate: ({ qRealtime, pRealtime, qDayAhead, pDayAhead, qLongTerm, pLongTerm, pSettlementRef }) =>
+          qLongTerm * pLongTerm +
+          qLongTerm * (pDayAhead - pSettlementRef) +
+          (qDayAhead - qLongTerm) * pDayAhead +
+          (qRealtime - qDayAhead) * pRealtime
+      }
+    };
+
+    const fieldIds = ['qRealtime', 'pRealtime', 'qDayAhead', 'pDayAhead', 'qLongTerm', 'pLongTerm', 'pSettlementRef'];
+    let activeFormula = 1;
 
     const number = (id) => {
       const value = parseFloat(document.getElementById(id).value);
       return Number.isFinite(value) ? value : 0;
     };
 
+    const values = () => ({
+      qRealtime: number('qRealtime'),
+      pRealtime: number('pRealtime'),
+      qDayAhead: number('qDayAhead'),
+      pDayAhead: number('pDayAhead'),
+      qLongTerm: number('qLongTerm'),
+      pLongTerm: number('pLongTerm'),
+      pSettlementRef: number('pSettlementRef')
+    });
+
+    const setFormula = (formulaId) => {
+      activeFormula = formulaId;
+      document.querySelectorAll('.formula-btn').forEach((btn) => {
+        btn.classList.toggle('active', Number(btn.dataset.formula) === formulaId);
+      });
+      document.getElementById('formulaText').innerHTML = formulaMap[formulaId].text;
+    };
+
     const calculate = () => {
-      const qRealtime = number('qRealtime');
-      const pRealtime = number('pRealtime');
-      const qDayAhead = number('qDayAhead');
-      const pDayAhead = number('pDayAhead');
-      const qLongTerm = number('qLongTerm');
-      const pLongTerm = number('pLongTerm');
-      const pSettlementRef = number('pSettlementRef');
+      const input = values();
+      const selected = formulaMap[activeFormula];
+      const expression = selected.expression(input);
+      const powerFee = selected.calculate(input);
 
-      const powerFee =
-        qRealtime * pRealtime +
-        qDayAhead * (pDayAhead - pRealtime) +
-        qLongTerm * (pLongTerm - pSettlementRef);
-
+      document.getElementById('formulaExpression').textContent = expression;
       document.getElementById('powerFee').textContent = powerFee.toLocaleString('zh-CN', {
         minimumFractionDigits: 3,
         maximumFractionDigits: 3
       });
     };
 
-    fields.forEach((id) => {
-      document.getElementById(id).addEventListener('input', calculate);
+    document.querySelectorAll('.formula-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        setFormula(Number(btn.dataset.formula));
+      });
     });
 
-    calculate();
+    fieldIds.forEach((id) => {
+      document.getElementById(id).addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+          calculate();
+        }
+      });
+    });
+
+    document.getElementById('calculateBtn').addEventListener('click', calculate);
+    setFormula(1);
   </script>
 </body>
 </html>
