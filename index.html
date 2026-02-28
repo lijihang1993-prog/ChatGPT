@@ -93,6 +93,10 @@
       border-color: #5f7be4;
       box-shadow: 0 0 0 3px rgba(95, 123, 228, 0.15);
     }
+    input::placeholder {
+      font-size: 0.82rem;
+      color: #7a88a8;
+    }
     .actions {
       margin-top: 18px;
       display: flex;
@@ -109,6 +113,19 @@
     }
     .calc-btn:hover {
       background: #2345af;
+    }
+    .clear-btn {
+      margin-left: 10px;
+      border: 1px solid #c5d3f5;
+      border-radius: 10px;
+      background: #f7f9ff;
+      color: #28408f;
+      font-size: 1rem;
+      padding: 10px 20px;
+      cursor: pointer;
+    }
+    .clear-btn:hover {
+      background: #edf2ff;
     }
     .result {
       margin-top: 18px;
@@ -156,36 +173,37 @@
     <section class="grid">
       <div>
         <label for="qRealtime">Q<sub>实时</sub></label>
-        <input id="qRealtime" type="number" step="any" placeholder="请输入 Q实时" />
+        <input id="qRealtime" type="number" step="any" placeholder="请输入 Q₍实时₎" />
       </div>
       <div>
         <label for="pRealtime">P<sub>实时</sub></label>
-        <input id="pRealtime" type="number" step="any" placeholder="请输入 P实时" />
+        <input id="pRealtime" type="number" step="any" placeholder="请输入 P₍实时₎" />
       </div>
       <div>
         <label for="qDayAhead">Q<sub>日前</sub></label>
-        <input id="qDayAhead" type="number" step="any" placeholder="请输入 Q日前" />
+        <input id="qDayAhead" type="number" step="any" placeholder="请输入 Q₍日前₎" />
       </div>
       <div>
         <label for="pDayAhead">P<sub>日前</sub></label>
-        <input id="pDayAhead" type="number" step="any" placeholder="请输入 P日前" />
+        <input id="pDayAhead" type="number" step="any" placeholder="请输入 P₍日前₎" />
       </div>
       <div>
         <label for="qLongTerm">Q<sub>中长期</sub></label>
-        <input id="qLongTerm" type="number" step="any" placeholder="请输入 Q中长期" />
+        <input id="qLongTerm" type="number" step="any" placeholder="请输入 Q₍中长期₎" />
       </div>
       <div>
         <label for="pLongTerm">P<sub>中长期</sub></label>
-        <input id="pLongTerm" type="number" step="any" placeholder="请输入 P中长期" />
+        <input id="pLongTerm" type="number" step="any" placeholder="请输入 P₍中长期₎" />
       </div>
       <div>
         <label for="pSettlementRef">P<sub>结算参考点</sub></label>
-        <input id="pSettlementRef" type="number" step="any" placeholder="请输入 P结算参考点" />
+        <input id="pSettlementRef" type="number" step="any" placeholder="请输入 P₍结算参考点₎" />
       </div>
     </section>
 
     <div class="actions">
       <button class="calc-btn" id="calculateBtn" type="button">计算</button>
+      <button class="clear-btn" id="clearBtn" type="button">清空</button>
     </div>
 
     <section class="result">
@@ -281,7 +299,16 @@
       });
     });
 
+    const clear = () => {
+      fieldIds.forEach((id) => {
+        document.getElementById(id).value = "";
+      });
+      document.getElementById('formulaExpression').textContent = "-";
+      document.getElementById('powerFee').textContent = "0.000";
+    };
+
     document.getElementById('calculateBtn').addEventListener('click', calculate);
+    document.getElementById('clearBtn').addEventListener('click', clear);
     setFormula(1);
   </script>
 </body>
