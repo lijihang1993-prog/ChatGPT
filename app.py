@@ -10,6 +10,7 @@ def main():
     parser.add_argument("--sheet-bs", default="资产负债表", help="资产负债表sheet名")
     parser.add_argument("--sheet-is", default="损益表 ", help="损益表sheet名（默认带尾随空格）")
     parser.add_argument("--sheet-cf", default="现金流量表", help="现金流量表sheet名")
+    parser.add_argument("--sheet-kpi", default="主要财务数据及指标", help="可选指标校验sheet名")
     parser.add_argument("--config", default="config.yml", help="配置文件路径")
     args = parser.parse_args()
 
@@ -19,6 +20,7 @@ def main():
         sheet_bs=args.sheet_bs,
         sheet_is=args.sheet_is,
         sheet_cf=args.sheet_cf,
+        sheet_kpi=args.sheet_kpi,
         config_path=args.config,
     )
     print(f"分析完成，结果已输出到：{args.output_dir}")
